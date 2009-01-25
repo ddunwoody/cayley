@@ -4,7 +4,6 @@ require 'rubygems'
 
 require 'gosu'
 require 'box2d'
-require 'singleton'
 
 include Gosu
 include Box2d
@@ -27,8 +26,8 @@ module Simulation
   do_sleep = true
   @@world = B2World.new aabb, gravity, do_sleep
 
-  def self.add_body(*args, &block)
-    @@bodies << Body.new(*args, &block)
+  def self.add_body(&block)
+    @@bodies << Body.new(Body::Configuration.new(&block))
   end
 
   def self.update
@@ -44,38 +43,58 @@ module Simulation
   end
 end
 
-class Body
-  attr_accessor :colour, :density, :friction, :half_height, :half_width,
-    :restitution
+class Vector
+  attr_accessor :x, :y
 
   def initialize x, y
-    raise 'A block must be given' unless block_given?
-    yield self
+    @x, @y = x, y
+  end
+end
+
+class Body
+  attr_reader :colour, :dimensions
+
+  def initialize config
+    @colour, @dimensions = config.colour, config.dimensions
     body_def = B2BodyDef.new
-    body_def.position.Set x, y
+    body_def.position.Set config.position[0], config.position[1]
 
     @body = Simulation.world.CreateBody body_def
 
     shape_def = B2PolygonDef.new
-    shape_def.SetAsBox @half_width, @half_height
-    shape_def.density = @density if @density
-    shape_def.friction = @friction if @friction
-    shape_def.restitution = @restitution if @restitution
+    shape_def.SetAsBox @dimensions.x / 2.0, @dimensions.y / 2.0
+    shape_def.density = config.density if config.density
+    shape_def.friction = config.friction if config.friction
+    shape_def.restitution = config.restitution if config.restitution
 
     @body.CreateShape shape_def
-    @body.SetMassFromShapes if @density
+    @body.SetMassFromShapes if config.density
   end
 
-  def set_as_box half_width, half_height
-    @half_width, @half_height = half_width, half_height
-  end
 
   def position
     @body.GetPosition
   end
 
-  def angle
-    @body.GetAngle
+  class Configuration
+    attr_accessor :colour, :density, :friction, :position, :restitution
+    attr_reader :dimensions
+
+    def initialize
+      raise 'A block must be given' unless block_given?
+      yield self
+      raise 'position must be set' unless @position
+      raise 'dimensions must be set' unless @dimensions
+      raise 'colour must be set' unless @colour
+    end
+
+    def dimensions= dimensions
+      if dimensions.is_a? Vector
+        @dimensions = dimensions
+      elsif dimensions.respond_to? :length and dimensions.length == 2
+        @dimensions = Vector.new dimensions[0], dimensions[1]
+      end
+    end
   end
 end
 
@@ -83,13 +102,15 @@ class MainWindow < Window
   def initialize
     super WIDTH, HEIGHT, false, TIMESTEP
     self.caption = 'Cayley'
-    Simulation.add_body(WIDTH/2, 20) do |body|
-      body.set_as_box 100, 10
+    Simulation.add_body do |body|
+      body.position = WIDTH/2, 20
+      body.dimensions = 200, 20
       body.colour = 0xFF7FFF7F
     end
 
-    Simulation.add_body(WIDTH/2, 100) do |body|
-      body.set_as_box 5, 5
+    Simulation.add_body do |body|
+      body.position = WIDTH/2, 100
+      body.dimensions = 10, 10
       body.colour = 0xFFFFFFFF
       body.density = 1
       body.friction = 0.3
@@ -105,7 +126,7 @@ class MainWindow < Window
     Simulation.bodies.each do |body|
       position = body.position
       x, y = position.x, HEIGHT-position.y
-      hw, hh = body.half_width, body.half_height
+      hw, hh = body.dimensions.x / 2.0, body.dimensions.y / 2.0
       c = body.colour
       draw_quad x-hw, y-hh, c, x+hw, y-hh, c, x-hw, y+hh, c, x+hw, y+hh, c
     end
