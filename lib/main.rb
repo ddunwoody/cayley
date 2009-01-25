@@ -10,7 +10,7 @@ include Box2d
 
 WIDTH = 640
 HEIGHT = 480
-TIMESTEP = 1/60.0
+TIMESTEP = 1 / 60.0
 
 module Simulation
   VELOCITY_ITERATIONS = 8
@@ -80,7 +80,6 @@ class Body
     @body.CreateShape shape_def
     @body.SetMassFromShapes if config.density
   end
-
 
   def position
     @body.GetPosition
