@@ -41,6 +41,16 @@ module Simulation
   def self.world
     @@world
   end
+
+  def self.draw window
+    @@bodies.each do |body|
+      position = body.position
+      x, y = position.x, HEIGHT-position.y
+      hw, hh = body.dimensions.x / 2.0, body.dimensions.y / 2.0
+      c = body.colour
+      window.draw_quad x-hw, y-hh, c, x+hw, y-hh, c, x-hw, y+hh, c, x+hw, y+hh, c
+    end
+  end
 end
 
 class Vector
@@ -102,6 +112,7 @@ class MainWindow < Window
   def initialize
     super WIDTH, HEIGHT, false, TIMESTEP
     self.caption = 'Cayley'
+
     Simulation.add_body do |body|
       body.position = WIDTH/2, 20
       body.dimensions = 200, 20
@@ -123,13 +134,7 @@ class MainWindow < Window
   end
 
   def draw
-    Simulation.bodies.each do |body|
-      position = body.position
-      x, y = position.x, HEIGHT-position.y
-      hw, hh = body.dimensions.x / 2.0, body.dimensions.y / 2.0
-      c = body.colour
-      draw_quad x-hw, y-hh, c, x+hw, y-hh, c, x-hw, y+hh, c, x+hw, y+hh, c
-    end
+    Simulation.draw self
   end
 
   def button_down id
