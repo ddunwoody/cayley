@@ -12,38 +12,41 @@ include Box2d
 WIDTH = 640
 HEIGHT = 480
 TIMESTEP = 1/60.0
-VELOCITY_ITERATIONS = 8
-POSITION_ITERATIONS = 1
 
-class Simulation
-  include Singleton
+module Simulation
+  VELOCITY_ITERATIONS = 8
+  POSITION_ITERATIONS = 1
 
-  attr_reader :bodies, :world
+  @@bodies = []
 
-  def initialize
-    @bodies = []
-    aabb = B2AABB.new
-    aabb.lowerBound.Set 0, 0
-    aabb.upperBound.Set WIDTH, HEIGHT
+  aabb = B2AABB.new
+  aabb.lowerBound.Set 0, 0
+  aabb.upperBound.Set WIDTH, HEIGHT
 
-    gravity = B2Vec2.new 0, -10
-    do_sleep = true
-    @world = B2World.new aabb, gravity, do_sleep
+  gravity = B2Vec2.new 0, -10
+  do_sleep = true
+  @@world = B2World.new aabb, gravity, do_sleep
+
+  def self.add_body(*args, &block)
+    @@bodies << Body.new(*args, &block)
   end
 
-  def add_body(*args, &block)
-    @bodies << Body.new(*args, &block)
+  def self.update
+    @@world.Step TIMESTEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS
   end
 
-  def update
-    @world.Step TIMESTEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS
+  def self.bodies
+    @@bodies
   end
 
+  def self.world
+    @@world
+  end
 end
 
 class Body
-  attr_accessor :colour, :half_width, :half_height,
-    :density, :friction, :restitution
+  attr_accessor :colour, :density, :friction, :half_height, :half_width,
+    :restitution
 
   def initialize x, y
     raise 'A block must be given' unless block_given?
@@ -51,7 +54,7 @@ class Body
     body_def = B2BodyDef.new
     body_def.position.Set x, y
 
-    @body = Simulation.instance.world.CreateBody body_def
+    @body = Simulation.world.CreateBody body_def
 
     shape_def = B2PolygonDef.new
     shape_def.SetAsBox @half_width, @half_height
@@ -70,18 +73,22 @@ class Body
   def position
     @body.GetPosition
   end
+
+  def angle
+    @body.GetAngle
+  end
 end
 
 class MainWindow < Window
   def initialize
     super WIDTH, HEIGHT, false, TIMESTEP
     self.caption = 'Cayley'
-    Simulation.instance.add_body(WIDTH/2, 20) do |body|
+    Simulation.add_body(WIDTH/2, 20) do |body|
       body.set_as_box 100, 10
       body.colour = 0xFF7FFF7F
     end
 
-    Simulation.instance.add_body(WIDTH/2, 100) do |body|
+    Simulation.add_body(WIDTH/2, 100) do |body|
       body.set_as_box 5, 5
       body.colour = 0xFFFFFFFF
       body.density = 1
@@ -91,11 +98,11 @@ class MainWindow < Window
   end
 
   def update
-    Simulation.instance.update
+    Simulation.update
   end
 
   def draw
-    Simulation.instance.bodies.each do |body|
+    Simulation.bodies.each do |body|
       position = body.position
       x, y = position.x, HEIGHT-position.y
       hw, hh = body.half_width, body.half_height
