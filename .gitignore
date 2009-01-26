@@ -1,3 +1,5 @@
+*.pyc
+python/nbproject
 ruby/box2d/Makefile
 ruby/box2d/box2d*
 ruby/box2d/mkmf.log
