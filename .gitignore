@@ -1,4 +1,4 @@
-box2d/Makefile
-box2d/box2d*
-box2d/mkmf.log
-nbproject
+ruby/box2d/Makefile
+ruby/box2d/box2d*
+ruby/box2d/mkmf.log
+ruby/nbproject
