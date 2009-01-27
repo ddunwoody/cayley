@@ -23,16 +23,10 @@ class Body:
             self.body.SetMassFromShapes()
 
     def draw(self):
-        b = self.body
-        x, y = b.position.x, b.position.y
-        c = self.colour
-        hw, hh = self.dimensions[0] / 2.0, self.dimensions[1] / 2.0
-        draw(4, GL_QUADS,
-             ('v2f', (
-             x - hw, y + hh,
-             x + hw, y + hh,
-             x + hw, y - hh,
-             x - hw, y - hh)),
-             ('c3f', c * 4)
-             )
+        vertices = ()
+        for shape in self.body.GetShapeList():
+            for vertex in shape.getVertices_b2Vec2():
+                vertices += self.body.GetWorldPoint(vertex).tuple()
+        glColor3f(self.colour[0], self.colour[1], self.colour[2])
+        draw(len(vertices) / 2, GL_POLYGON, ('v2f', vertices))
 
