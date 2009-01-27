@@ -24,19 +24,7 @@ window = Window(width=WIDTH, height=HEIGHT, caption='Cayley', config=config)
 def on_draw():
     glClear(GL_COLOR_BUFFER_BIT)
     for body in simulation.bodies:
-        position = body.position()
-        x, y = position.x, position.y
-        c = body.colour
-        hw, hh = body.dimensions[0] / 2.0, body.dimensions[1] / 2.0
-        draw(4, GL_QUADS,
-             ('v2f', (
-             x - hw, y + hh,
-             x + hw, y + hh,
-             x + hw, y - hh,
-             x - hw, y - hh)),
-             ('c3f', c * 4)
-             )
+        body.draw()
 
 clock.schedule_interval(simulation.update, TIMESTEP)
-
 app.run()

@@ -1,4 +1,6 @@
 from Box2D import *
+from pyglet.gl import *
+from pyglet.graphics import *
 
 class Body:
     def __init__(self, simulation, position, dimensions, colour, density=None,
@@ -20,5 +22,17 @@ class Body:
         if density is not None:
             self.body.SetMassFromShapes()
 
-    def position(self):
-        return self.body.position
+    def draw(self):
+        b = self.body
+        x, y = b.position.x, b.position.y
+        c = self.colour
+        hw, hh = self.dimensions[0] / 2.0, self.dimensions[1] / 2.0
+        draw(4, GL_QUADS,
+             ('v2f', (
+             x - hw, y + hh,
+             x + hw, y + hh,
+             x + hw, y - hh,
+             x - hw, y - hh)),
+             ('c3f', c * 4)
+             )
+
