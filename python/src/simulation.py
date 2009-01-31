@@ -18,7 +18,5 @@ class Simulation:
         self.world.Step(dt, self.VELOCITY_ITERATIONS,
                         self.POSITION_ITERATIONS)
 
-    def add_body(self, position, dimensions, colour, density=None,
-                 friction=None, restitution=None):
-        self.bodies.append(Body(self, position, dimensions, colour, density,
-                           friction, restitution))
+    def add_body(self, *args, **kw):
+        self.bodies.append(Body(self, *args, **kw))
