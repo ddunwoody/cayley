@@ -25,14 +25,33 @@ config = Config(sample_buffers=1, samples=4, depth_size=16,
                 double_buffer=True)
 
 window = Window(width=width, height=height, caption='Cayley', resizable=True,
-                config=config)
-window.set_location(int(screen.width * MARGIN), int(screen.height * MARGIN))
+                config=config, visible=False)
+window.set_exclusive_mouse()
+
+class Camera:
+    init = False
+    x = y = 0
+
+camera = Camera()
 
 @window.event
 def on_draw():
     glClear(GL_COLOR_BUFFER_BIT)
+    glLoadIdentity()
+    glTranslatef(camera.x, camera.y, 0)
     for body in simulation.bodies:
         body.draw()
 
+@window.event
+def on_mouse_motion(x, y, dx, dy):
+    if camera.init:
+        camera.x += dx
+        camera.y += dy
+    else:
+        camera.init = True
+
 clock.schedule_interval(simulation.update, TIMESTEP)
+
+window.set_visible()
+window.set_location(int(screen.width * MARGIN), int(screen.height * MARGIN))
 app.run()
