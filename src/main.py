@@ -5,9 +5,9 @@ from world import World
 
 world = World(10000, 10000)
 
-ground = Polygon(colour=(0.5, 1, 0.5))
-ground.setAsBox(5000, 50)
-world.add_body((0, -25), ground)
+ground = Polygon(colour=(0.5, 0.5, 0.5))
+ground.setAsBox(5000, 1000)
+world.add_body((0, -500), ground)
 
 ship_vert_l = ((-10, -10),
                (0, -5),
@@ -19,8 +19,10 @@ ship_vert_r = ((10, -10),
                (0, -5))
 
 d, f, r = 1, 0.3, 0.2
-ship_l = Polygon(vertices=ship_vert_l, density=d, friction=f, restitution=r)
-ship_r = Polygon(vertices=ship_vert_r, density=d, friction=f, restitution=r)
+ship_l = Polygon(vertices=ship_vert_l, colour=(1, 0.25, 0.25),
+                 density=d, friction=f, restitution=r)
+ship_r = Polygon(vertices=ship_vert_r, colour=(0.25, 1, 0.25),
+                 density=d, friction=f, restitution=r)
 world.add_body((0, 10), ship_l, ship_r)
 
 window = Window(world, caption='Cayley', resizable=True, visible=False)
