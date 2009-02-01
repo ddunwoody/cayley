@@ -1,4 +1,4 @@
-from Box2D import *
+from Box2D import b2AABB, b2BodyDef, b2World
 from body import Body
 
 class World:
@@ -18,5 +18,11 @@ class World:
         self.world.Step(dt, self.VELOCITY_ITERATIONS,
                         self.POSITION_ITERATIONS)
 
-    def add_body(self, *args, **kw):
-        self.bodies.append(Body(self, *args, **kw))
+    def add_body(self, position, polygon):
+        body_def = b2BodyDef()
+        body_def.position = position
+        body = self.world.CreateBody(body_def)
+        body.CreateShape(polygon.shape)
+        if polygon.shape.density is not None:
+            body.SetMassFromShapes()
+        self.bodies.append(Body(body, polygon))
