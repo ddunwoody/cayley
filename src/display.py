@@ -2,16 +2,26 @@ from pyglet.gl import *
 import pyglet
 
 class Camera:
-    has_moved = False
     x = y = 0
+    _zoom = 1
+    zoom_inc = 0.1
+
+    def move(self, dx, dy):
+        self.x += dx * 1 / self._zoom
+        self.y += dy * 1 / self._zoom
     
-    def move_by(self, dx, dy):
-        # don't move for the first event
-        if self.has_moved:
-            self.x += dx
-            self.y += dy
-        else:
-            self.has_moved = True
+    def zoom(self, factor):
+        self._zoom += factor * self.zoom_inc
+        if self._zoom < self.zoom_inc:
+            self._zoom = self.zoom_inc
+
+    def configure_gl_matrix(self, width, height):
+        glLoadIdentity()
+        hw, hh = width / 2, height / 2
+        glTranslatef(hw, hh, 0)
+        glScalef(self._zoom, self._zoom, 1)
+        glTranslatef(-hw, -hh, 0)
+        glTranslatef(self.x, self.y, 0)
         
 class Window(pyglet.window.Window):
     def __init__(self, world, *args, **kwargs):
@@ -22,7 +32,7 @@ class Window(pyglet.window.Window):
         self.camera = Camera()
         self.set_exclusive_mouse()
 
-    def size_to_margin(self, margin):
+    def set_screen_margin(self, margin):
         screen = self.screen
         border_width = int(self.screen.width * margin)
         border_height = int(self.screen.height * margin)
@@ -34,12 +44,22 @@ class Window(pyglet.window.Window):
         y = (self.screen.height - self.height) / 2
         self.set_location(x, y)
 
+    # move the camera such that the centre of the window looks at this point
+    def focus_camera(self, x, y):
+        self.camera.x = self.width / 2 - x
+        self.camera.y = self.height / 2 - y
+
     def on_draw(self):
         glClear(GL_COLOR_BUFFER_BIT)
-        glLoadIdentity()
-        glTranslatef(self.camera.x, self.camera.y, 0)
+        self.camera.configure_gl_matrix(self.width, self.height)
         for body in self.world.bodies:
             body.draw()
 
+
     def on_mouse_motion(self, x, y, dx, dy):
-        self.camera.move_by(dx, dy)
+        # ignore first motion
+        if x != dx or y != dy:
+            self.camera.move(dx, dy)
+
+    def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
+        self.camera.zoom(scroll_y)

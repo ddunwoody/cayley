@@ -8,7 +8,7 @@ class World:
     def __init__(self, width, height):
         self.bodies = []
         aabb = b2AABB()
-        aabb.lowerBound = (0, 0)
+        aabb.lowerBound = (-width, -height)
         aabb.upperBound = (width, height)
         gravity = (0, -10)
         do_sleep = True
