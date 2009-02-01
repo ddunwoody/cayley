@@ -14,11 +14,11 @@ class Camera:
             self.has_moved = True
         
 class Window(pyglet.window.Window):
-    def __init__(self, simulation, *args, **kwargs):
+    def __init__(self, world, *args, **kwargs):
         config = Config(sample_buffers=1, samples=4, depth_size=16,
                         double_buffer=True)
         super(Window, self).__init__(config=config, *args, **kwargs)
-        self.simulation = simulation
+        self.world = world
         self.camera = Camera()
         self.set_exclusive_mouse()
 
@@ -38,7 +38,7 @@ class Window(pyglet.window.Window):
         glClear(GL_COLOR_BUFFER_BIT)
         glLoadIdentity()
         glTranslatef(self.camera.x, self.camera.y, 0)
-        for body in self.simulation.bodies:
+        for body in self.world.bodies:
             body.draw()
 
     def on_mouse_motion(self, x, y, dx, dy):

@@ -1,7 +1,7 @@
 from Box2D import *
 from body import Body
 
-class Simulation:
+class World:
     VELOCITY_ITERATIONS = 8
     POSITION_ITERATIONS = 1
 
