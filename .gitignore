@@ -1,8 +1,3 @@
 *.pyc
-python/nbproject
-python/.project
-python/.pydevproject
-ruby/box2d/Makefile
-ruby/box2d/box2d*
-ruby/box2d/mkmf.log
-ruby/nbproject
+.project
+.pydevproject
