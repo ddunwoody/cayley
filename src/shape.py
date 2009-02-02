@@ -1,5 +1,5 @@
 from Box2D import b2CircleDef, b2PolygonDef
-from render import draw_circle, draw_polygon
+from render import draw_circle, draw_polygon, set_color
 
 class Shape(object):
     def __init__(self, shape=None, colour=(1,1,1), density=None,
@@ -29,8 +29,10 @@ class Circle(Shape):
         
     def draw(self, body):
         center = body.GetWorldPoint(self.shape.localPosition).tuple()
+        axis = body.angle
         radius = self.shape.radius
-        draw_circle(self.colour, center, radius)
+        set_color(self.colour)
+        draw_circle(center, axis, radius)
 
 
 class Polygon(Shape):
@@ -50,4 +52,5 @@ class Polygon(Shape):
         vertices = ()
         for vertex in self.shape.getVertices_b2Vec2():
             vertices += body.GetWorldPoint(vertex).tuple()
-        draw_polygon(self.colour, vertices)
+        set_color(self.colour)
+        draw_polygon(vertices)

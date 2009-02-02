@@ -38,6 +38,7 @@ class Window(pyglet.window.Window):
         self.set_exclusive_mouse()
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+        glLineWidth(2)
 
     def set_screen_margin(self, margin):
         screen = self.screen
