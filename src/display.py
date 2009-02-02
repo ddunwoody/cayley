@@ -1,7 +1,6 @@
 from pyglet.gl import *
 from pyglet.graphics import draw
 from pyglet.window import key
-import pyglet
 
 class Camera:
     DEFAULT_ZOOM = 2
