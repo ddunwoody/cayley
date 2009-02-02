@@ -27,5 +27,5 @@ def draw_circle(center, axis, radius):
         vertices += (cos(n) * radius + center[0],
                      sin(n) * radius + center[1])
     draw_polygon(vertices)
-    draw_lines((center[0], center[1], 
+    draw_lines((center[0], center[1],
                 cos(axis) * radius + center[0], sin(axis) * radius + center[1]))
