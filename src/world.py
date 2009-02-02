@@ -17,7 +17,7 @@ class World:
         self.world.Step(dt, self.VELOCITY_ITERATIONS,
                         self.POSITION_ITERATIONS)
 
-    def add_body(self, position, *shapes):
+    def create_body(self, position, *shapes):
         body_def = b2BodyDef()
         body_def.position = position
         body = self.world.CreateBody(body_def)
@@ -26,5 +26,7 @@ class World:
             if shape.shape.density is not None:
                 body.SetMassFromShapes()
         self.render_list.append((body, shapes))
+        return body
 
-
+    def create_joint(self, joint_def):
+        return self.world.CreateJoint(joint_def).getAsType()

@@ -18,7 +18,7 @@ class Shape(object):
 
 
 class Circle(Shape):
-    def __init__(self, local_position, radius, colour=(1,1,1),
+    def __init__(self, radius, local_position=(0,0), colour=(1,1,1),
                density=None, friction=None, restitution=None):
         self.shape = b2CircleDef()
         super(Circle, self).__init__(shape=b2CircleDef(), colour=colour,
