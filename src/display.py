@@ -1,3 +1,5 @@
+from math import cos, pi, sin
+from shape import Circle, Polygon
 from pyglet.gl import *
 from pyglet.graphics import draw
 from pyglet.window import key
@@ -36,6 +38,8 @@ class Window(pyglet.window.Window):
         self.world = world
         self.camera = Camera()
         self.set_exclusive_mouse()
+        glEnable(GL_BLEND)
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
     def set_screen_margin(self, margin):
         screen = self.screen
@@ -76,15 +80,33 @@ class Window(pyglet.window.Window):
         self.camera.configure_gl_matrix(self.width, self.height)
         for item in self.world.render_list:
             body = item[0]
-            polygons = item[1]
-            for polygon in polygons:
-                vertices = ()
-                for vertex in polygon.shape.getVertices_b2Vec2():
-                    vertices += body.GetWorldPoint(vertex).tuple()
-                    glColor3f(polygon.colour[0], 
-                              polygon.colour[1], 
-                              polygon.colour[2])
-                    draw(len(vertices) / 2, 
-                         GL_POLYGON, 
-                         ('v2f', vertices))
-
+            shapes = item[1]
+            for shape in shapes:
+                glColor4f(shape.colour[0],
+                          shape.colour[1],
+                          shape.colour[2],
+                          0.5)
+                if isinstance(shape, Polygon):
+                    vertices = ()
+                    for vertex in shape.shape.getVertices_b2Vec2():
+                        vertices += body.GetWorldPoint(vertex).tuple()
+                        draw(len(vertices) / 2,
+                             GL_POLYGON,
+                             ('v2f', vertices))
+                elif isinstance(shape, Circle):
+                    points = 24
+                    step = 2 * pi / points
+                    radius = shape.shape.radius
+                    centre = body.GetWorldPoint(shape.shape.localPosition).tuple()
+                    vertices = ()
+                    n = 0
+                    for i in range(0, points):
+                        vertices += centre
+                        vertices += (cos(n) * radius + centre[0],
+                                     sin(n) * radius + centre[1])
+                        n += step 
+                        vertices += (cos(n) * radius + centre[0],
+                                     sin(n) * radius + centre[1])
+                        draw(len(vertices) / 2,
+                             GL_POLYGON,
+                             ('v2f', vertices))

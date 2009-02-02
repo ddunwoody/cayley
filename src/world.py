@@ -17,14 +17,14 @@ class World:
         self.world.Step(dt, self.VELOCITY_ITERATIONS,
                         self.POSITION_ITERATIONS)
 
-    def add_body(self, position, *polygons):
+    def add_body(self, position, *shapes):
         body_def = b2BodyDef()
         body_def.position = position
         body = self.world.CreateBody(body_def)
-        for polygon in polygons:
-            body.CreateShape(polygon.shape)
-            if polygon.shape.density is not None:
+        for shape in shapes:
+            body.CreateShape(shape.shape)
+            if shape.shape.density is not None:
                 body.SetMassFromShapes()
-        self.render_list.append((body, polygons))
+        self.render_list.append((body, shapes))
 
 
