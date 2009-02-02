@@ -1,10 +1,12 @@
 from pyglet.gl import *
 from pyglet.graphics import draw
+from pyglet.window import key
 import pyglet
 
 class Camera:
+    DEFAULT_ZOOM = 2
     x = y = 0
-    zoom = 1
+    zoom = DEFAULT_ZOOM
     zoom_inc = 0.1
 
     def move(self, dx, dy):
@@ -13,8 +15,10 @@ class Camera:
     
     def adjust_zoom(self, factor):
         self.zoom += factor * self.zoom_inc
-        if self.zoom < self.zoom_inc:
-            self.zoom = self.zoom_inc
+        self.zoom = min(max(self.zoom, self.zoom_inc), 10)
+
+    def set_zoom_to_default(self):
+        self.zoom = self.DEFAULT_ZOOM
 
     def configure_gl_matrix(self, width, height):
         glLoadIdentity()
@@ -61,6 +65,12 @@ class Window(pyglet.window.Window):
 
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
         self.camera.adjust_zoom(scroll_y)
+
+    def on_key_press(self, symbol, modifiers):
+        if symbol == key.ESCAPE:
+            self.close()
+        elif symbol == key.BACKSPACE:
+            self.camera.set_zoom_to_default()
 
     def on_draw(self):
         glClear(GL_COLOR_BUFFER_BIT)
