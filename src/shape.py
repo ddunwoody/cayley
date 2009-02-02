@@ -18,6 +18,8 @@ class Shape(object):
     def __str__(self):
         return "Shape(%s, colour: %s)" % (self.shape.__str__(), self.colour)
 
+    def set_gl_color(self):
+        glColor4f(self.colour[0], self.colour[1], self.colour[2], 0.5)
 
 class Circle(Shape):
     def __init__(self, local_position, radius, colour=(1,1,1),
@@ -30,10 +32,7 @@ class Circle(Shape):
         self.shape.radius = radius
         
     def draw(self, body):
-        glColor4f(self.colour[0],
-                  self.colour[1],
-                  self.colour[2],
-                  0.5)
+        self.set_gl_color()
         points = 24
         step = 2 * pi / points
         radius = self.shape.radius
@@ -66,10 +65,7 @@ class Polygon(Shape):
         self.shape.setVertices(((-hx, -hy), (hx, -hy), (hx, hy), (-hx, hy)))
 
     def draw(self, body):
-        glColor4f(self.colour[0],
-                  self.colour[1],
-                  self.colour[2],
-                  0.5)
+        self.set_gl_color()
         vertices = ()
         for vertex in self.shape.getVertices_b2Vec2():
             vertices += body.GetWorldPoint(vertex).tuple()
