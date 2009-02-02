@@ -1,6 +1,6 @@
+from display import Window
 from polygon import Polygon
 from pyglet import app, clock
-from pyglet.window import Window
 from world import World
 
 world = World(10000, 10000)
