@@ -1,7 +1,5 @@
-from math import cos, pi, sin
 from shape import Circle, Polygon
 from pyglet.gl import *
-from pyglet.graphics import draw
 from pyglet.window import key
 
 class Camera:
@@ -82,31 +80,4 @@ class Window(pyglet.window.Window):
             body = item[0]
             shapes = item[1]
             for shape in shapes:
-                glColor4f(shape.colour[0],
-                          shape.colour[1],
-                          shape.colour[2],
-                          0.5)
-                if isinstance(shape, Polygon):
-                    vertices = ()
-                    for vertex in shape.shape.getVertices_b2Vec2():
-                        vertices += body.GetWorldPoint(vertex).tuple()
-                        draw(len(vertices) / 2,
-                             GL_POLYGON,
-                             ('v2f', vertices))
-                elif isinstance(shape, Circle):
-                    points = 24
-                    step = 2 * pi / points
-                    radius = shape.shape.radius
-                    centre = body.GetWorldPoint(shape.shape.localPosition).tuple()
-                    vertices = ()
-                    n = 0
-                    for i in range(0, points):
-                        vertices += centre
-                        vertices += (cos(n) * radius + centre[0],
-                                     sin(n) * radius + centre[1])
-                        n += step 
-                        vertices += (cos(n) * radius + centre[0],
-                                     sin(n) * radius + centre[1])
-                        draw(len(vertices) / 2,
-                             GL_POLYGON,
-                             ('v2f', vertices))
+                shape.draw(body)

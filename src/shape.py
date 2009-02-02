@@ -1,4 +1,7 @@
 from Box2D import b2CircleDef, b2PolygonDef
+from math import cos, pi, sin
+from pyglet.gl import *
+from pyglet.graphics import draw
 
 class Shape(object):
     def __init__(self, shape=None, colour=(1,1,1), density=None,
@@ -25,6 +28,28 @@ class Circle(Shape):
                                      restitution=restitution)
         self.shape.localPosition = local_position
         self.shape.radius = radius
+        
+    def draw(self, body):
+        glColor4f(self.colour[0],
+                  self.colour[1],
+                  self.colour[2],
+                  0.5)
+        points = 24
+        step = 2 * pi / points
+        radius = self.shape.radius
+        centre = body.GetWorldPoint(self.shape.localPosition).tuple()
+        vertices = ()
+        n = 0
+        for i in range(0, points):
+            vertices += centre
+            vertices += (cos(n) * radius + centre[0],
+                         sin(n) * radius + centre[1])
+            n += step 
+            vertices += (cos(n) * radius + centre[0],
+                         sin(n) * radius + centre[1])
+            draw(len(vertices) / 2,
+                 GL_POLYGON,
+                 ('v2f', vertices))
 
 
 class Polygon(Shape):
@@ -39,3 +64,15 @@ class Polygon(Shape):
     def setAsBox(self, x, y):
         hx, hy = x / 2, y / 2
         self.shape.setVertices(((-hx, -hy), (hx, -hy), (hx, hy), (-hx, hy)))
+
+    def draw(self, body):
+        glColor4f(self.colour[0],
+                  self.colour[1],
+                  self.colour[2],
+                  0.5)
+        vertices = ()
+        for vertex in self.shape.getVertices_b2Vec2():
+            vertices += body.GetWorldPoint(vertex).tuple()
+            draw(len(vertices) / 2,
+                 GL_POLYGON,
+                 ('v2f', vertices))
